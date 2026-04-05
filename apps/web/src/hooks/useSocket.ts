@@ -1,6 +1,6 @@
 'use client';
 
-import type { ClientToServerEvents, ServerToClientEvents } from '@vibeloop/types';
+import type { ClientToServerEvents, ServerToClientEvents } from '../types';
 import { useEffect, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
