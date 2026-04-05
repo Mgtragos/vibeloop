@@ -1,7 +1,30 @@
-node_modules
-dist
-.next
-coverage
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.next/
+*.js.map
+*.d.ts
+*.d.ts.map
+*.js
+
+# Keep source TypeScript only
+!*.config.js
+!postcss.config.js
+!next.config.js
+!tailwind.config.js
+
+# OS
+.DS_Store
+
+# Env files
 .env
 .env.local
-*.tsbuildinfo
+.env*.local
+
+# Claude
+.claude/
+
+# Logs
+*.log
