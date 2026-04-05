@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ─────────────────────────────────────────────────────────────────────
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum SessionStatus {
+  ACTIVE
+  CLOSED
+  ARCHIVED
+}
+
+enum ReportReason {
+  SPAM
+  HARASSMENT
+  INAPPROPRIATE_CONTENT
+  FAKE_PROFILE
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
+  DISMISSED
+}
+
+enum IcebreakerOutcome {
+  MATCHED
+  SKIPPED
+  TIMED_OUT
+  DECLINED
+}
+
+// ── User ──────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  username     String     @unique
+  displayName  String?
+  avatarUrl    String?
+  bio          String?
+  status       UserStatus @default(ACTIVE)
+  isVerified   Boolean    @default(false)
+  lastActiveAt DateTime?
+
+  // Relations
+  interestVector   InterestVector?
+  initiatedSessions ChatSession[]   @relation("SessionInitiator")
+  receivedSessions  ChatSession[]   @relation("SessionReceiver")
+  filedReports     Report[]         @relation("ReportFiler")
+  receivedReports  Report[]         @relation("ReportTarget")
+  icebreakersSent  IcebreakerLog[]  @relation("IcebreakerSender")
+  icebreakersRecv  IcebreakerLog[]  @relation("IcebreakerReceiver")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([username])
+  @@index([status])
+}
+
+// ── InterestVector ────────────────────────────────────────────────────────────
+// Stores a user's interest profile as a vector (for similarity matching)
+// and a structured tag list.
+
+model InterestVector {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Embedding stored as a JSON array of floats (swap for pgvector if available)
+  vector    Json     @default("[]")
+  // Freeform interest tags derived from onboarding / behaviour
+  tags      String[]
+  // Confidence score of the last vector update [0, 1]
+  confidence Float   @default(0)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ── ChatSession ───────────────────────────────────────────────────────────────
+
+model ChatSession {
+  id          String        @id @default(cuid())
+  initiatorId String
+  receiverId  String
+  status      SessionStatus @default(ACTIVE)
+  topic       String?
+  startedAt   DateTime      @default(now())
+  endedAt     DateTime?
+
+  // Relations
+  initiator    User           @relation("SessionInitiator", fields: [initiatorId], references: [id])
+  receiver     User           @relation("SessionReceiver",  fields: [receiverId],  references: [id])
+  messages     Message[]
+  icebreakerLog IcebreakerLog?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([initiatorId])
+  @@index([receiverId])
+  @@index([status])
+}
+
+// ── Message ───────────────────────────────────────────────────────────────────
+
+model Message {
+  id        String   @id @default(cuid())
+  sessionId String
+  senderId  String
+  body      String
+  readAt    DateTime?
+
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([senderId])
+}
+
+// ── Report ────────────────────────────────────────────────────────────────────
+
+model Report {
+  id          String       @id @default(cuid())
+  filerId     String
+  targetId    String
+  reason      ReportReason
+  status      ReportStatus @default(PENDING)
+  description String?
+  reviewNote  String?
+  resolvedAt  DateTime?
+
+  filer  User @relation("ReportFiler",  fields: [filerId],  references: [id])
+  target User @relation("ReportTarget", fields: [targetId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([filerId])
+  @@index([targetId])
+  @@index([status])
+}
+
+// ── IcebreakerLog ─────────────────────────────────────────────────────────────
+// Records every icebreaker prompt exchange — what was sent, by whom,
+// against which session, and how it resolved.
+
+model IcebreakerLog {
+  id         String            @id @default(cuid())
+  senderId   String
+  receiverId String
+  sessionId  String?           @unique
+  prompt     String
+  response   String?
+  outcome    IcebreakerOutcome @default(SKIPPED)
+  sentAt     DateTime          @default(now())
+  resolvedAt DateTime?
+
+  sender   User         @relation("IcebreakerSender",   fields: [senderId],   references: [id])
+  receiver User         @relation("IcebreakerReceiver", fields: [receiverId], references: [id])
+  session  ChatSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([outcome])
+}
