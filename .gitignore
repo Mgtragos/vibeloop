@@ -1,36 +1,8 @@
-# Dependencies
 node_modules/
-
-# Build outputs - compiled JS from TypeScript
-apps/api/dist/
-apps/api/src/**/*.js
-apps/api/src/**/*.js.map
-apps/api/src/**/*.d.ts
-apps/api/src/**/*.d.ts.map
-apps/api/.tsbuildinfo
-
-packages/types/dist/
-packages/types/src/**/*.js
-packages/types/src/**/*.js.map
-packages/types/src/**/*.d.ts
-packages/types/src/**/*.d.ts.map
-
-apps/web/.next/
-apps/web/tsconfig.tsbuildinfo
-apps/web/tailwind.config.d.ts
-apps/web/tailwind.config.d.ts.map
-apps/web/tailwind.config.js.map
-
-# OS
-.DS_Store
-
-# Env files
 .env
 .env.local
-.env*.local
-
-# Claude
+.DS_Store
 .claude/
-
-# Logs
 *.log
+apps/web/.next/
+apps/api/dist/
