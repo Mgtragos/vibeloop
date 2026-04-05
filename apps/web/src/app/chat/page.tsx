@@ -160,8 +160,8 @@ export default function ChatPage() {
       setState({ phase: 'idle' });
       setMessages([]);
     });
-    socket.on('chat:error', ({ message }) => setError(message));
-    socket.on('chat:message', ({ text }) => {
+    socket.on('chat:error', ({ message }: { message: string }) => setError(message));
+    socket.on('chat:message', ({ text }: { text: string }) => {
       setMessages((prev) => [...prev, { id: crypto.randomUUID(), text, self: false }]);
     });
 
