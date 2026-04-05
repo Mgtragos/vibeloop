@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "concurrently -n api,web -c cyan,magenta \"npm run dev -w @vibeloop/api\" \"npm run dev -w @vibeloop/web\"",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w @vibeloop/types && npm run build -w @vibeloop/api && npm run build -w @vibeloop/web",
     "db:migrate": "npm run prisma:migrate -w @vibeloop/api",
     "db:generate": "npm run prisma:generate -w @vibeloop/api",
     "db:studio": "npm run prisma:studio -w @vibeloop/api",

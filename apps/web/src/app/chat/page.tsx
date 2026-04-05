@@ -147,7 +147,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('chat:queued', ({ position }) => {
+    socket.on('chat:queued', ({ position }: { position: number }) => {
       setState({ phase: 'queued', position });
       setError(null);
     });
