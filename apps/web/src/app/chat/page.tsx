@@ -151,7 +151,7 @@ export default function ChatPage() {
       setState({ phase: 'queued', position });
       setError(null);
     });
-    socket.on('chat:matched', ({ partnerId: pid, initiator: init }) => {
+    socket.on('chat:matched', ({ partnerId: pid, initiator: init }: { partnerId: string; initiator: boolean }) => {
       setState({ phase: 'matched', partnerId: pid, initiator: init });
       setMessages([]);
       setError(null);
