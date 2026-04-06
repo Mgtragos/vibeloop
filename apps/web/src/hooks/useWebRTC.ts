@@ -8,13 +8,14 @@ import type { ChatSocket } from './useSocket';
 
 const ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
   {
-    urls: 'turn:a.relay.metered.ca:80',
-    username: 'openrelayproject',
-    credential: 'openrelayproject',
-  },
-  {
-    urls: 'turn:a.relay.metered.ca:443',
+    urls: [
+      'turn:a.relay.metered.ca:80',
+      'turn:a.relay.metered.ca:80?transport=tcp',
+      'turn:a.relay.metered.ca:443',
+      'turn:a.relay.metered.ca:443?transport=tcp',
+    ],
     username: 'openrelayproject',
     credential: 'openrelayproject',
   },
@@ -100,7 +101,12 @@ export function useWebRTC({ socket, partnerId, initiator }: UseWebRTCOptions): U
 
     console.log('[WebRTC] Creating PeerConnection', { partnerId, initiator });
 
-    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+    const pc = new RTCPeerConnection({
+      iceServers: ICE_SERVERS,
+      iceCandidatePoolSize: 10,
+      bundlePolicy: 'max-bundle',
+      rtcpMuxPolicy: 'require',
+    });
     pcRef.current = pc;
 
     const pendingCandidates: RTCIceCandidateInit[] = [];
