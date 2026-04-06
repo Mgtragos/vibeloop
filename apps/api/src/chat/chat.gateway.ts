@@ -21,7 +21,13 @@ type ChatSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
 
 @WebSocketGateway({
   namespace: '/chat',
-  cors: { origin: process.env['CORS_ORIGIN'] ?? 'http://localhost:3000', credentials: true },
+  cors: {
+    origin: [
+      process.env['CORS_ORIGIN'] ?? 'http://localhost:3000',
+      'https://vibeloop-web.vercel.app',
+    ],
+    credentials: true,
+  },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
