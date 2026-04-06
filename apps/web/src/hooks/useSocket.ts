@@ -22,8 +22,11 @@ export function useSocket(): ChatSocket | null {
 
   useEffect(() => {
     const s: ChatSocket = io(`${CHAT_URL}/chat`, {
-      transports: ['websocket'],
-      autoConnect: true,
+      transports: ['websocket', 'polling'],
+      timeout: 20000,
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
     });
 
     socketRef.current = s;
