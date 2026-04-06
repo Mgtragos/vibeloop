@@ -8,7 +8,16 @@ import type { ChatSocket } from './useSocket';
 
 const ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
+  {
+    urls: 'turn:a.relay.metered.ca:80',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
+  {
+    urls: 'turn:a.relay.metered.ca:443',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
 ];
 
 // ── Signal message types ──────────────────────────────────────────────────────
