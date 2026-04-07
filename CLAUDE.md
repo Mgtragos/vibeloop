@@ -2,6 +2,17 @@
 
 Real-time video chat platform. Monorepo managed with **npm workspaces**.
 
+## Deployment
+
+| Service | URL | Status |
+|---|---|---|
+| Frontend | https://vibeloop-web.vercel.app | Live |
+| Backend | https://vibeloop-production.up.railway.app | Live |
+
+**Current issue:** WebRTC fails between different devices — the open relay TURN server (metered.ca free tier) is unreliable.
+
+**Next step:** Register at metered.ca for dedicated TURN credentials and update `ICE_SERVERS` in `apps/web/src/hooks/useWebRTC.ts` with the account-specific username/credential.
+
 ## Structure
 
 ```
